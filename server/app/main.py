@@ -2,6 +2,7 @@ from typing import Optional
 from fastapi import FastAPI
 from pydantic import BaseModel
 from redis import Redis
+import os
 
 import json
 
@@ -11,7 +12,7 @@ class Request(BaseModel):
     position_y: Optional[float]
 
 app = FastAPI()
-redis = Redis(host="redis", port=6379, password='redispass')
+redis = Redis(host="redis", port=6379, password=os.getenv('REDIS_PASSWORD'))
 
 @app.get("/")
 async def root():
@@ -21,9 +22,3 @@ async def root():
 async def add(request: Request):
     redis.publish('clockin', json.dumps(request.dict()))
     return {"code": 200, "message": "added"}
-
-@app.get("/list")
-async def list():
-    return {"code": 200, 'data': {
-        "count": redis.llen('requests')
-    }}
