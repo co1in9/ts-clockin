@@ -1,0 +1,21 @@
+version: "3.7"
+
+services:
+  redis:
+    image: redis:6.0.10-alpine
+    ports:
+      - "26379:6379"
+    volumes:
+      - redis-data:/var/lib/redis/data
+    command: redis-server --requirepass ${REDIS_PASSWORD}
+    restart: always
+    env_file: .env
+  
+  api:
+    build: ./server
+    env_file: .env
+    ports:
+      - "8000:80"
+
+volumes:
+  redis-data:
